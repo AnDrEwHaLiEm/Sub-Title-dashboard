@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import SubtitleComponent from './SubTitle';
-import { rf3_b5or } from './data/data';
+import { El_3ed } from './data/data';
 import { axiosApis } from './API/axiosSetup';
 const App = () => {
   const [subtitles, setSubtitles] = useState(["Andrew Haliem", "اندرو حليم"]);
-  const [childIndex, setChildIndex] = useState(0);
-  const [currentLevel, setCurrentLevel] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState(0); // رفع البخور تقديم الحمل
+  const [childIndex, setChildIndex] = useState(0); // ابانا الذى فلنشكر صانع الخيرات
+  const [currentIndex, setCurrentIndex] = useState(0); // index of subtitle
   const [socket, setSocket] = useState(null);
 
 
@@ -18,6 +18,14 @@ const App = () => {
       newSocket.close();
     };
   }, []);
+
+  const updateSubtitle = (data, index) => {
+    setCurrentIndex(index);
+    console.log({ data, index });
+    if (socket) {
+      socket.send(JSON.stringify({ action: 'updateSubtitle', message_1: data[index], message_2: data[index + 1] }));
+    }
+  };
 
 
   const getSubtitles = (path) => {
@@ -37,6 +45,7 @@ const App = () => {
   const handleItemClick = (path, levelIndex, childIndex) => {
     return async (e) => {
       e.preventDefault();
+      console.log({ path, levelIndex, childIndex });
       const data = await getSubtitles(path);
       setChildIndex(childIndex);
       setCurrentLevel(levelIndex);
@@ -45,21 +54,15 @@ const App = () => {
   }
 
 
-  const updateSubtitle = (data, index) => {
-    setCurrentIndex(index);
-    console.log({ data, index });
-    if (socket) {
-      socket.send(JSON.stringify({ action: 'updateSubtitle', message_1: data[index], message_2: data[index + 1] }));
-    }
-  };
+
 
   const getNextChild = async (levelIndex, index) => {
     console.log("Enter getNextChild", levelIndex, index);
     let currentChildIndex = index;
-    while (currentChildIndex <= rf3_b5or[levelIndex].children.length - 1) {
+    while (currentChildIndex <= El_3ed[levelIndex].children.length - 1) {
 
-      if (rf3_b5or[levelIndex].children[currentChildIndex].active) {
-        const data = await getSubtitles(rf3_b5or[levelIndex].children[currentChildIndex].path);
+      if (El_3ed[levelIndex].children[currentChildIndex].active) {
+        const data = await getSubtitles(El_3ed[levelIndex].children[currentChildIndex].path);
         setChildIndex(currentChildIndex);
         updateSubtitle(data, 0);
         return true;
@@ -72,7 +75,7 @@ const App = () => {
 
   const getNextLevel = async () => {
     let currentLevelIndex = currentLevel + 1;
-    while (currentLevelIndex < rf3_b5or.length - 1) {
+    while (currentLevelIndex < El_3ed.length - 1) {
       const flag = await getNextChild(currentLevelIndex, 0);
       if (flag) {
         setCurrentLevel(currentLevelIndex);
@@ -85,8 +88,8 @@ const App = () => {
   const getPrevChild = async (levelIndex, index) => {
     let currentChildIndex = index;
     while (currentChildIndex >= 0) {
-      if (rf3_b5or[levelIndex].children[currentChildIndex].active) {
-        const data = await getSubtitles(rf3_b5or[levelIndex].children[currentChildIndex].path);
+      if (El_3ed[levelIndex].children[currentChildIndex].active) {
+        const data = await getSubtitles(El_3ed[levelIndex].children[currentChildIndex].path);
         setChildIndex(currentChildIndex);
         updateSubtitle(data, data.length - 2);
         return true;
@@ -102,7 +105,7 @@ const App = () => {
     let currentLevelIndex = currentLevel - 1;
     while (currentLevelIndex >= 0) {
       console.log("Enter getPrevLevel", currentLevelIndex);
-      const flag = await getPrevChild(currentLevelIndex, rf3_b5or[currentLevelIndex].children.length - 1);
+      const flag = await getPrevChild(currentLevelIndex, El_3ed[currentLevelIndex].children.length - 1);
       if (flag) {
         setCurrentLevel(currentLevelIndex);
         return;
@@ -140,26 +143,18 @@ const App = () => {
     <>
       <div style={{ direction: 'rtl', display: 'flex', justifyContent: 'space-evenly', gap: '25px', maxWidth: '100%', overflow: 'auto' }}>
         {
-          [1, 2, 3, 4, 5, 6, 7].map((item, index) => {
+          El_3ed.map((item, levelIndex) => {
             return (
               <>
-                <ol key={index} style={{ direction: 'rtl', backgroundColor: 'gray', minWidth: '200px' }}>
-                  <h2>{`العنوان ${item}`}</h2>
-                  {rf3_b5or.map((item, levelIndex) => {
+                <ol key={levelIndex} style={{ direction: 'rtl', backgroundColor: 'gray', minWidth: '200px', paddingBottom: "10px" }}>
+                  <h2>{item.title}</h2>
+                  {item.children.map((item, childIndex) => {
                     return (
-                      <li key={levelIndex}>
-                        {item.title}
-                        <ul>
-                          {item.children.map((child, childIndex) => {
-                            return (
-                              <li key={childIndex} onClick={handleItemClick(child.path, levelIndex, childIndex)}>
-                                {child.name}
-                              </li>
-                            );
-                          })}
-                        </ul>
+                      <li key={childIndex} onClick={handleItemClick(item.path, levelIndex, childIndex)}>
+                        {item.name}
                       </li>
-                    )
+                    );
+
                   })}
                 </ol>
               </>
