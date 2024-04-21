@@ -50,3 +50,14 @@ h2.displayed-text {
   margin-right: 50%;
   background-color: brown
 }
+
+p,
+label {
+  font:
+    1rem 'Fira Sans',
+    sans-serif;
+}
+
+input {
+  margin: 0.4rem;
+}
