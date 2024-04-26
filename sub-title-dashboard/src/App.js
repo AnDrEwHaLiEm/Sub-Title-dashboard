@@ -9,7 +9,7 @@ const App = () => {
   const [childIndex, setChildIndex] = useState(0); // ابانا الذى فلنشكر صانع الخيرات
   const [currentIndex, setCurrentIndex] = useState(0); // index of subtitle
   const [socket, setSocket] = useState(null);
-
+  const [styleVersion, setStyleVersion] = useState(0);
 
   useEffect(() => {
     const newSocket = new WebSocket('ws://192.168.1.13:8080');
@@ -26,6 +26,13 @@ const App = () => {
       socket.send(JSON.stringify({ action: 'updateSubtitle', message_1: data[index], message_2: data[index + 1] }));
     }
   };
+
+  const updateStyleVersion = (style) => {
+    setStyleVersion(style);
+    if (socket) {
+      socket.send(JSON.stringify({ action: 'updateStyleVersion', styleVersion: style }));
+    }
+  }
 
 
   const getSubtitles = (path) => {
@@ -139,29 +146,50 @@ const App = () => {
     }
   };
 
+
+
   return (
     <>
       <div style={{ direction: 'rtl', display: 'flex', justifyContent: 'space-evenly', gap: '25px', maxWidth: '100%', overflow: 'auto' }}>
         {
           El_3ed.map((item, levelIndex) => {
             return (
-              <>
-                <ol key={levelIndex} style={{ direction: 'rtl', backgroundColor: 'gray', minWidth: '200px', paddingBottom: "10px" }}>
-                  <h2>{item.title}</h2>
-                  {item.children.map((item, childIndex) => {
+              <div style={{ backgroundColor: (levelIndex === currentLevel ? 'teal':'gray'), minWidth: '250px', textAlign: 'center' }}>
+                <h2 style={{ color: (levelIndex === currentLevel ? 'white' : 'black') }}>{item.title}</h2>
+                <ol key={levelIndex} style={{ textAlign: 'right', columnCount: (item.children.length > 15 ? '2' : '1'), direction: 'rtl', paddingBottom: "10px", marginLeft: '2px' }}>
+                  {item.children.map((item, childNumber) => {
                     return (
-                      <li key={childIndex} onClick={handleItemClick(item.path, levelIndex, childIndex)}>
+                      <li key={childNumber} onClick={handleItemClick(item.path, levelIndex, childNumber)}
+                        style={{
+                          color: (
+                            currentLevel === levelIndex ?
+                              childIndex === childNumber ?
+                                'HighlightText' : 'black' : 'black'
+                          )
+                        }}
+                      >
                         {item.name}
                       </li>
                     );
 
                   })}
                 </ol>
-              </>
+              </div>
             )
           })
         }
       </div>
+      <fieldset>
+        <legend>اختر نظام العرض</legend>
+        <div>
+          <input type="radio" id="first" name="styleVersion" value="0" onClick={(e) => { updateStyleVersion(0) }} checked={styleVersion === 0} />
+          <label for="first">النظام الاول</label>
+          <br />
+          <input type="radio" id="second" name="styleVersion" value="1" onClick={(e) => { updateStyleVersion(1) }} checked={styleVersion === 1} />
+          <label for="second">النظام الثانى</label>
+        </div>
+
+      </fieldset>
       <SubtitleComponent
         subtitle_1={subtitles[currentIndex]}
         subtitle_2={subtitles[currentIndex + 1]}

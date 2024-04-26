@@ -20,6 +20,10 @@ body {
   width: 600px;
 }
 
+li:hover {
+  cursor: pointer;
+}
+
 h2.displayed-text {
   color: white;
   font-size: 20px;
@@ -32,23 +36,19 @@ h2.displayed-text {
   color: white;
   padding: 10px 20px;
   border: none;
-  cursor: pointer;
   size: 200px;
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
 .prev-btn {
-  order: -1;
-  align-self: flex-start;
-  margin-right: 50%;
-  background-color: darkkhaki;
+  margin-left: 100px;
+  background-color: rgb(159, 32, 49);
 }
 
 .next-btn {
-  align-self: flex-end;
-  margin-right: 50%;
-  background-color: brown
+  margin-left: 20px;
+  background-color: rgb(31, 149, 77)
 }
 
 p,

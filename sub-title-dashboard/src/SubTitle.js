@@ -5,7 +5,6 @@ const SubtitleComponent = ({ subtitle_1, subtitle_2, nextStep, prevStep }) => {
 
     return (
         <div style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-            <button className='prev-btn' onClick={prevStep}>Previous</button>
             <div className="backgroundDiv" style={{ margin: '0 10px' }}>
                 <h2 className='displayed-text'>{subtitle_1}</h2>
             </div>
@@ -14,6 +13,7 @@ const SubtitleComponent = ({ subtitle_1, subtitle_2, nextStep, prevStep }) => {
             <div className="backgroundDiv" style={{ margin: '0 10px' }}>
                 <h2 className='displayed-text'>{subtitle_2}</h2>
             </div>
+            <button className='prev-btn' onClick={prevStep}>Previous</button>
             <button className="next-btn" onClick={nextStep}>Next</button>
         </div>
     );
